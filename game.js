@@ -1,19 +1,72 @@
-// Iteration 1: Declare variables required for this game
+let timerelement = document.getElementById("timer");
+let gamebody = document.getElementById("game-body");
+timerelement.innerHTML = 60;
+let timerspan = 60;
 
-// Iteration 1.2: Add shotgun sound
+let zombiearray = [
+  "./assets/zombie-1.png",
+  "./assets/zombie-2.png",
+  "./assets/zombie-3.png",
+  "./assets/zombie-4.png",
+  "./assets/zombie-6.png",
+  "./assets/zombie-5.png",
+];
 
-// Iteration 1.3: Add background sound
+let lives = 4;
+let uniqueid = 0;
 
-// Iteration 1.4: Add lives
+gamebody.addEventListener("click", function () {
+  let shotgunsound = new Audio("./assets/shotgun.wav");
+  shotgunsound.play();
+});
 
-// Iteration 2: Write a function to make a zombie
+let bgm = new Audio("./assets/bgm.mp3");
+bgm.play();
+bgm.loop = true;
 
-// Iteration 3: Write a function to check if the player missed a zombie
+let createzombie = function () {
+  let zombierandom = zombiearray[Math.floor(Math.random() * 6)];
+  let randomsec = Math.floor(Math.random() * (10 - 3)) + 3;
+  let screenoccupiedrandom = Math.floor(Math.random() * (80 - 20)) + 20;
 
-// Iteration 4: Write a function to destroy a zombie when it is shot or missed
+  gamebody.innerHTML += `<img src="${zombierandom}" alt="" id="zombieId-${uniqueid}" class="zombie-image">`;
+  let getzombieimg = document.getElementById(`zombieId-${uniqueid}`);
 
-// Iteration 5: Creating timer
+  getzombieimg.style.transform = `translateX(${screenoccupiedrandom}vw)`;
+  getzombieimg.style.animationDuration = `${randomsec}s`;
+  getzombieimg.addEventListener("click", () => destroyzombie(getzombieimg));
+  uniqueid++;
+};
 
-// Iteration 6: Write a code to start the game by calling the first zombie
+function destroyzombie(getzombieimg) {
+  getzombieimg.style.display = "none";
+  createzombie();
+}
 
-// Iteration 7: Write the helper function to get random integer
+setInterval(() => {
+  timerspan -= 1;
+  document.getElementById("timer").innerHTML = timerspan;
+
+  let getzombieimg = document.getElementById(`zombieId-${uniqueid - 1}`);
+  if (getzombieimg && getzombieimg.getBoundingClientRect().top <= 0) {
+    lives--;
+    destroyzombie(getzombieimg);
+  }
+
+  if (timerspan == 0) {
+    window.location.href = "./win.html";
+  }
+
+  if (lives == 3) {
+    document.querySelector("#max-lives").style.width = "75%";
+  } else if (lives == 2) {
+    document.querySelector("#max-lives").style.width = "50%";
+  } else if (lives == 1) {
+    document.querySelector("#max-lives").style.width = "25%";
+  } else if (lives == 0) {
+    document.querySelector("#max-lives").style.width = "0%";
+    window.location.href = "./game-over.html";
+  }
+}, 1000);
+
+createzombie();
